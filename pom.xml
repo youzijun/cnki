@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>2.0.3</version>
+            <version>2.0.4</version>
         </dependency>
 
         <!-- excel -->
@@ -85,7 +85,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.cnki.Main</mainClass>
+                    <mainClass>com.cnki.ParsePdfForEmail</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -96,7 +96,7 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>download-pdf</finalName>
+        <finalName>ParseEmail</finalName>
     </build>
 
 </project>
