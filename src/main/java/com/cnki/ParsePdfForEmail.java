@@ -2,6 +2,8 @@ package com.cnki;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.util.StringUtils;
+
 import java.io.*;
 import java.util.Scanner;
 import java.io.IOException;
@@ -35,8 +37,10 @@ public class ParsePdfForEmail {
             return;
         }
 
+        int count = 0;
         for(File f : files){
-
+            count++;
+            System.out.println("第" + count + "开始执行");
             if(!f.getPath().contains(".caj") && !f.getPath().contains(".pdf") && !f.getPath().contains(".txt")){
                 File file = new File(f.getPath());
                 File[] files1 = file.listFiles();
@@ -46,13 +50,17 @@ public class ParsePdfForEmail {
                     continue;
                 }
             }
+            if(f.getPath().contains(".txt")){
+                continue;
+            }
 
 
             PDDocument document = null;
             try {
                 document = PDDocument.load(f);
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                System.out.println("文件有误，解析失败");
                 continue;
             }
 
@@ -77,44 +85,83 @@ public class ParsePdfForEmail {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            String email = "";
+
             if(content.contains("通讯作者")){
-                String email;
-                email = content.substring(content.indexOf("通讯作者"), content.indexOf("通讯作者")+100);
+
+                int num = content.length();
+                if(num > (content.indexOf("通讯作者")+100)){
+                    num = content.indexOf("通讯作者")+100;
+                }
+                email = content.substring(content.indexOf("通讯作者"), num);
                 if(email.contains("cn")){
                     email = email.substring(email.indexOf("通讯作者"), email.indexOf("cn")) + "cn";
                 }else if(email.contains("net")){
                     email = email.substring(email.indexOf("通讯作者"), email.indexOf("net")) + "net";
                 }else if(email.contains("com")){
                     email = email.substring(email.indexOf("通讯作者"), email.indexOf("com")) + "com";
-                }
-
-                email = email.replaceAll(" ", "");
-                email = email.replaceAll("．", ".");
-
-                //存文件
-                File f1 = new File(filePath);
-
-                try {
-                    if (f1.exists()) {
-                        System.out.print("文件存在");
-                    } else {
-                        System.out.print("文件不存在=========================================");
-                        return;
-                    }
-
-                    BufferedWriter output = new BufferedWriter(new FileWriter(f1,true));
-
-                    output.write(email);
-                    output.write("\r\n");//换行
-
-                    output.flush();
-                    output.close();
-                    System.out.print("==============邮箱写入成功：" + email);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                }else if(email.contains("org")){
+                    email = email.substring(email.indexOf("通讯作者"), email.indexOf("org")) + "org";
+                }else{
+                    email = "1没有匹配到邮箱";
                 }
 
             }
+            if(!email.contains("@")) {
+
+                if (content.contains("mail")) {
+                    int num = content.length();
+                    if (num > (content.indexOf("mail") + 50)) {
+                        num = content.indexOf("mail") + 50;
+                    }
+                    email = content.substring(content.indexOf("mail"), num);
+                    if (email.contains("cn")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("cn")) + "cn";
+                    } else if (email.contains("net")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("net")) + "net";
+                    } else if (email.contains("com")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("com")) + "com";
+                    } else if (email.contains("org")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("org")) + "org";
+                    } else {
+                        email = "2没有匹配到邮箱";
+                    }
+                }
+            }
+
+            email = email.replaceAll(" ", "");
+            email = email.replaceAll("．", ".");
+
+
+            if(StringUtils.isEmpty(email.trim())){
+                continue;
+            }
+
+            //存文件
+            File f1 = new File(filePath);
+
+            try {
+                if (f1.exists()) {
+                    System.out.print("文件存在" + email);
+                } else {
+                    System.out.print("文件不存在=========================================");
+                    return;
+                }
+
+                BufferedWriter output = new BufferedWriter(new FileWriter(f1,true));
+
+                output.write(email);
+                output.write("\r\n");//换行
+
+                output.flush();
+                output.close();
+                System.out.print("==============邮箱写入成功：" + email);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
     }
