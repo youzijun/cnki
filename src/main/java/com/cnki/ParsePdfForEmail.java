@@ -44,7 +44,7 @@ public class ParsePdfForEmail {
             if(!f.getPath().contains(".caj") && !f.getPath().contains(".pdf") && !f.getPath().contains(".txt")){
                 File file = new File(f.getPath());
                 File[] files1 = file.listFiles();
-                if(files1.length > 0){
+                if(files1 != null && files1.length > 0){
                     f = files1[0];
                 }else{
                     continue;
@@ -128,10 +128,28 @@ public class ParsePdfForEmail {
                         email = "2没有匹配到邮箱";
                     }
                 }
+            }else{
+                if (email.contains("mail")) {
+                    int num = email.length();
+                    email = email.substring(email.indexOf("mail"), num);
+                    if (email.contains("cn")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("cn")) + "cn";
+                    } else if (email.contains("net")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("net")) + "net";
+                    } else if (email.contains("com")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("com")) + "com";
+                    } else if (email.contains("org")) {
+                        email = email.substring(email.indexOf("mail"), email.indexOf("org")) + "org";
+                    } else {
+                        email = "2没有匹配到邮箱";
+                    }
+                }
             }
 
             email = email.replaceAll(" ", "");
             email = email.replaceAll("．", ".");
+            email = email.replaceAll("\r", "");
+            email = email.replaceAll("\n", "");
 
 
             if(StringUtils.isEmpty(email.trim()) || !email.contains("@")){
