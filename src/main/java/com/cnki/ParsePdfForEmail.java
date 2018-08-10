@@ -134,7 +134,7 @@ public class ParsePdfForEmail {
             email = email.replaceAll("．", ".");
 
 
-            if(StringUtils.isEmpty(email.trim())){
+            if(StringUtils.isEmpty(email.trim()) || !email.contains("@")){
                 continue;
             }
 
